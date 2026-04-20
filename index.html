@@ -1,0 +1,2213 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול תורים – מרפאה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a5c;
+            --primary-mid: #1e5799;
+            --primary-light: #2980b9;
+            --primary-pale: #dbeafe;
+            --accent: #f97316;
+            --accent-light: #fb923c;
+            --accent-dark: #ea6a06;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --bg: #f1f5f9;
+            --bg2: #e8eef5;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(15, 52, 100, 0.08);
+            --shadow-lg: 0 8px 32px rgba(15, 52, 100, 0.16), 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-xl: 0 20px 60px rgba(15, 52, 100, 0.20);
+            --radius: 14px;
+            --radius-sm: 9px;
+            --radius-xs: 6px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 15px;
+        }
+
+        /* SIDEBAR */
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 252px;
+            background: linear-gradient(175deg, #0f2744 0%, #1a3a5c 45%, #1e4d7a 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #facc15, var(--accent-light));
+        }
+
+        .sidebar-logo {
+            padding: 30px 22px 22px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            width: 46px;
+            height: 46px;
+            background: linear-gradient(135deg, var(--accent), #facc15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(249,115,22,0.4);
+        }
+
+        .sidebar-logo h1 {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: white;
+        }
+
+        .sidebar-logo p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+            letter-spacing: 0.04em;
+        }
+
+        .nav {
+            padding: 18px 14px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-label {
+            font-size: 9.5px;
+            letter-spacing: 0.14em;
+            color: rgba(255,255,255,0.35);
+            padding: 6px 10px 8px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            color: rgba(255,255,255,0.70);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-bottom: 3px;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.09);
+            color: white;
+            transform: translateX(-2px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            color: white;
+            box-shadow: 0 4px 14px rgba(249,115,22,0.35);
+        }
+
+        .nav-item.active:hover {
+            transform: none;
+        }
+
+        .nav-item .icon {
+            font-size: 17px;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-badge {
+            margin-right: auto;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            font-size: 11px;
+            padding: 2px 9px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .nav-item.active .nav-badge {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* MAIN */
+        .main {
+            margin-right: 252px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 0 var(--border), 0 4px 16px rgba(0,0,0,0.04);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .topbar-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-pale), #bfdbfe);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .topbar h2 {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.02em;
+        }
+
+        .topbar p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .topbar-date-chip {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .content {
+            padding: 28px 32px;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 22px 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+        }
+
+        .stat-card:nth-child(1)::after { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .stat-card:nth-child(2)::after { background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+        .stat-card:nth-child(3)::after { background: linear-gradient(90deg, var(--success), #34d399); }
+        .stat-card:nth-child(4)::after { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #ffedd5, #fed7aa);
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+        }
+
+        .stat-num {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* SECTIONS */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(226,232,240,0.7);
+        }
+
+        .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, #fafcff, white);
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .card-header p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .card-body {
+            padding: 22px;
+        }
+
+        /* FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-grid.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .form-grid.cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Heebo', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: #f8fafc;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+            width: 100%;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3.5px rgba(41,128,185,0.14);
+            background: white;
+        }
+
+        .field input::placeholder { color: #b0bec5; }
+
+        .field textarea {
+            resize: none;
+            height: 72px;
+        }
+
+        .form-actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 11px 22px;
+            border-radius: var(--radius-sm);
+            font-family: 'Heebo', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-mid), var(--primary));
+            color: white;
+            box-shadow: 0 2px 8px rgba(26,87,153,0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-mid));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(26,87,153,0.35);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            box-shadow: 0 2px 8px rgba(249,115,22,0.3);
+        }
+
+        .btn-accent:hover {
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(249,115,22,0.35);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            background: var(--primary-pale);
+        }
+
+        .btn-danger-sm {
+            padding: 6px 13px;
+            border-radius: var(--radius-xs);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            background: var(--danger-light);
+            color: var(--danger);
+            transition: all 0.18s;
+            letter-spacing: 0.01em;
+        }
+
+        .btn-danger-sm:hover {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 2px 8px rgba(220,38,38,0.3);
+        }
+
+        /* ALERT */
+        .alert {
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border-right: 3px solid;
+        }
+
+        .alert.success {
+            background: var(--success-light);
+            color: var(--success);
+            border-color: var(--success);
+            display: flex;
+        }
+
+        .alert.error {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: var(--danger);
+            display: flex;
+        }
+
+        /* TABLE */
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+        }
+
+        thead th {
+            padding: 11px 16px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            text-align: right;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.14s;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafcff;
+        }
+
+        tbody tr:hover {
+            background: #f0f6ff;
+        }
+
+        td {
+            padding: 13px 16px;
+            font-size: 14px;
+            color: var(--text);
+            vertical-align: middle;
+        }
+
+        .td-name {
+            font-weight: 700;
+        }
+
+        .td-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* AVATAR */
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .av-blue {
+            background: linear-gradient(135deg, #dbeafe, #93c5fd);
+            color: var(--primary);
+        }
+
+        .av-green {
+            background: linear-gradient(135deg, #d1fae5, #6ee7b7);
+            color: var(--success);
+        }
+
+        .av-orange {
+            background: linear-gradient(135deg, #ffedd5, #fdba74);
+            color: #9a3412;
+        }
+
+        .name-cell {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
+        /* BADGE */
+        .badge {
+            display: inline-block;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-blue {
+            background: var(--primary-pale);
+            color: var(--primary-mid);
+        }
+
+        .badge-green {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-orange {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .badge-upcoming {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-past {
+            background: #f1f5f9;
+            color: var(--text-muted);
+        }
+
+        /* EMPTY */
+        .empty-state {
+            text-align: center;
+            padding: 44px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* TWO COLUMN LAYOUT */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 22px;
+            align-items: start;
+        }
+
+        /* ERD NOTE */
+        .erd-note {
+            background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+            border: 1.5px solid #bfdbfe;
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 22px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.08);
+        }
+
+        .erd-note .erd-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .erd-note h4 {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .erd-note p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+
+        /* SEARCH */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: 'Heebo', sans-serif;
+            background: white;
+            transition: border-color 0.18s, box-shadow 0.18s;
+        }
+
+        .search-input-wrap input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(41,128,185,0.12);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* DIVIDER */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 14px 0;
+        }
+
+        /* QUICK ACTION BUTTONS */
+        .quick-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: var(--radius-sm);
+            font-family: 'Heebo', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-align: right;
+        }
+
+        .quick-btn-primary {
+            background: linear-gradient(135deg, var(--primary-mid), var(--primary));
+            color: white;
+            box-shadow: 0 2px 8px rgba(26,87,153,0.25);
+        }
+
+        .quick-btn-primary:hover {
+            transform: translateX(-3px);
+            box-shadow: 0 6px 20px rgba(26,87,153,0.3);
+        }
+
+        .quick-btn-accent {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            box-shadow: 0 2px 8px rgba(249,115,22,0.25);
+        }
+
+        .quick-btn-accent:hover {
+            transform: translateX(-3px);
+            box-shadow: 0 6px 20px rgba(249,115,22,0.3);
+        }
+
+        .quick-btn-outline {
+            background: var(--bg);
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+        }
+
+        .quick-btn-outline:hover {
+            background: var(--primary-pale);
+            border-color: var(--primary-light);
+            color: var(--primary);
+            transform: translateX(-3px);
+        }
+
+        /* UPCOMING ROW */
+        .upcoming-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .upcoming-row:last-child {
+            border-bottom: none;
+        }
+
+        /* PATIENT PORTAL */
+        .portal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #0f2744 0%, #1a3a5c 40%, #1e5799 100%);
+            overflow-y: auto;
+        }
+
+        .portal-overlay.open {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            animation: portalIn 0.35s ease;
+        }
+
+        @keyframes portalIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .portal-header {
+            width: 100%;
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .portal-brand-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), #facc15);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .portal-brand-text h2 {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .portal-brand-text p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .portal-close-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .portal-close-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .portal-body {
+            width: 100%;
+            max-width: 560px;
+            padding: 40px 24px 60px;
+        }
+
+        .portal-progress {
+            display: flex;
+            align-items: center;
+            margin-bottom: 36px;
+            gap: 0;
+        }
+
+        .portal-step-dot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            position: relative;
+        }
+
+        .portal-step-dot::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            right: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+            z-index: 0;
+        }
+
+        .portal-step-dot:first-child::before { display: none; }
+
+        .portal-step-dot.done::before,
+        .portal-step-dot.active::before { background: var(--accent); }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.25);
+            color: rgba(255,255,255,0.5);
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .portal-step-dot.active .step-circle {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(249,115,22,0.25);
+        }
+
+        .portal-step-dot.done .step-circle {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .portal-step-dot.active .step-label { color: white; }
+        .portal-step-dot.done .step-label { color: rgba(255,255,255,0.7); }
+
+        .portal-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+        }
+
+        .portal-card h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .portal-card .portal-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .portal-step-content { display: none; }
+        .portal-step-content.active { display: block; }
+
+        .portal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-bottom: 18px;
+        }
+
+        .portal-field label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .portal-field input,
+        .portal-field select {
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 15px;
+            color: var(--text);
+            background: #f8fafc;
+            transition: all 0.18s;
+            width: 100%;
+        }
+
+        .portal-field input:focus,
+        .portal-field select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(41,128,185,0.12);
+            background: white;
+        }
+
+        .portal-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .portal-btn-primary {
+            background: linear-gradient(135deg, var(--primary-mid), var(--primary));
+            color: white;
+            box-shadow: 0 4px 14px rgba(26,87,153,0.3);
+        }
+
+        .portal-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(26,87,153,0.4);
+        }
+
+        .portal-btn-accent {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            box-shadow: 0 4px 14px rgba(249,115,22,0.3);
+        }
+
+        .portal-btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(249,115,22,0.4);
+        }
+
+        .portal-btn-outline {
+            background: white;
+            color: var(--text-muted);
+            border: 2px solid var(--border);
+            margin-top: 10px;
+        }
+
+        .portal-btn-outline:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .portal-alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            border-right: 3px solid;
+        }
+
+        .portal-alert.error {
+            background: var(--danger-light);
+            color: var(--danger);
+            border-color: var(--danger);
+            display: flex;
+        }
+
+        .portal-alert.success {
+            background: var(--success-light);
+            color: var(--success);
+            border-color: var(--success);
+            display: flex;
+        }
+
+        .patient-greeting {
+            background: linear-gradient(135deg, #dbeafe, #ede9fe);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .patient-greeting .greet-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary-mid), var(--primary));
+            border-radius: 50%;
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .patient-greeting .greet-text strong {
+            font-size: 15px;
+            color: var(--primary);
+            display: block;
+        }
+
+        .patient-greeting .greet-text span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .portal-confirm-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .portal-confirm-row:last-child { border-bottom: none; }
+
+        .portal-confirm-icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .portal-confirm-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .portal-confirm-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 2px;
+        }
+
+        .portal-success-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--success), #34d399);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 24px rgba(5,150,105,0.3);
+        }
+
+        .open-portal-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #059669, #34d399);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 20px;
+            font-family: 'Heebo', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(5,150,105,0.3);
+        }
+
+        .open-portal-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(5,150,105,0.4);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-right: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 20px 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-wrap">
+                    <div class="logo-badge">🏥</div>
+                    <div>
+                        <h1>מערכת ניהול תורים</h1>
+                        <p>מרפאה דיגיטלית</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="nav">
+                <div class="nav-label">ניווט ראשי</div>
+                <div class="nav-item active" onclick="showSection('dashboard')">
+                    <span class="icon">📊</span> לוח בקרה
+                </div>
+                <div class="nav-item" onclick="showSection('doctors')">
+                    <span class="icon">👨‍⚕️</span> רופאים
+                    <span class="nav-badge" id="badge-doctors">0</span>
+                </div>
+                <div class="nav-item" onclick="showSection('patients')">
+                    <span class="icon">🧑‍🦽</span> מטופלים
+                    <span class="nav-badge" id="badge-patients">0</span>
+                </div>
+                <div class="nav-item" onclick="showSection('appointments')">
+                    <span class="icon">📅</span> תורים
+                    <span class="nav-badge" id="badge-appts">0</span>
+                </div>
+                <div class="nav-label" style="margin-top:14px">מידע</div>
+                <div class="nav-item" onclick="showSection('erd')">
+                    <span class="icon">🗂️</span> מודל ERD
+                </div>
+            </nav>
+            <div class="sidebar-footer">
+                מבוסס על תרשים ERD<br>ניהול ועיצוב בסיסי נתונים
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <div class="topbar-icon" id="topbar-icon">📊</div>
+                    <div>
+                        <h2 id="page-title">לוח בקרה</h2>
+                        <p id="page-sub">סקירה כללית של המערכת</p>
+                    </div>
+                </div>
+                <div class="topbar-actions">
+                    <span class="topbar-date-chip" id="topbar-date"></span>
+                    <button class="open-portal-btn" onclick="openPortal()">
+                        <span>🙋</span> ממשק לקוח
+                    </button>
+                </div>
+            </div>
+
+            <div class="content">
+
+                <!-- DASHBOARD -->
+                <section id="sec-dashboard" class="section active">
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">👨‍⚕️</div>
+                            <div>
+                                <div class="stat-num" id="stat-doctors">0</div>
+                                <div class="stat-label">רופאים רשומים</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange">🧑‍🦽</div>
+                            <div>
+                                <div class="stat-num" id="stat-patients">0</div>
+                                <div class="stat-label">מטופלים רשומים</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">📅</div>
+                            <div>
+                                <div class="stat-num" id="stat-upcoming">0</div>
+                                <div class="stat-label">תורים קרובים</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple">✅</div>
+                            <div>
+                                <div class="stat-num" id="stat-total">0</div>
+                                <div class="stat-label">סה"כ תורים</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="two-col">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>⚡ פעולות מהירות</h3>
+                                    <p>הוסף נתונים חדשים</p>
+                                </div>
+                            </div>
+                            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+                                <button class="quick-btn quick-btn-primary" onclick="showSection('doctors')">
+                                    <span style="font-size:18px">👨‍⚕️</span> הוסף רופא חדש
+                                </button>
+                                <button class="quick-btn quick-btn-accent" onclick="showSection('patients')">
+                                    <span style="font-size:18px">🧑‍🦽</span> הוסף מטופל חדש
+                                </button>
+                                <button class="quick-btn quick-btn-outline" onclick="showSection('appointments')">
+                                    <span style="font-size:18px">📅</span> קבע תור חדש
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>🕐 תורים קרובים</h3>
+                                    <p>הצגת 5 תורים הבאים</p>
+                                </div>
+                            </div>
+                            <div id="upcoming-list" class="card-body">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📭</div>
+                                    <p>אין תורים עדיין</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- DOCTORS -->
+                <section id="sec-doctors" class="section">
+                    <div class="erd-note">
+                        <span class="erd-icon">🗂️</span>
+                        <div>
+                            <h4>ישות: רופא (Doctor) – לפי תרשים ERD</h4>
+                            <p>מפתח ראשי: <strong>מספר רישיון</strong> | תכונות: שם הרופא, מספר רישיון, חניה (לא רלוונטי
+                                למערכת – לא נכלל)</p>
+                        </div>
+                    </div>
+                    <div class="two-col">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>הוסף רופא</h3>
+                                    <p>מילוי פרטי רופא חדש</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="alert-doctor" class="alert"></div>
+                                <div class="form-grid cols-1">
+                                    <div class="field"><label>שם הרופא *</label><input id="d-name"
+                                            placeholder="ד״ר ישראל ישראלי"></div>
+                                    <div class="field"><label>מספר רישיון (מפתח ראשי) *</label><input id="d-license"
+                                            placeholder="למשל: 12345" inputmode="numeric"></div>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" onclick="addDoctor()">+ הוסף רופא</button>
+                                    <button class="btn btn-outline" onclick="clearDoctor()">נקה</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>רשימת רופאים</h3>
+                                    <p>כל הרופאים הרשומים במערכת</p>
+                                </div>
+                            </div>
+                            <div class="search-bar" style="padding:14px 20px 0">
+                                <div class="search-input-wrap">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" placeholder="חפש רופא..." oninput="filterDoctors(this.value)">
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>רופא</th>
+                                            <th>מספר רישיון</th>
+                                            <th>תורים</th>
+                                            <th>פעולה</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-doctors">
+                                        <tr>
+                                            <td colspan="4">
+                                                <div class="empty-state">
+                                                    <div class="empty-icon">👨‍⚕️</div>
+                                                    <p>אין רופאים עדיין</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PATIENTS -->
+                <section id="sec-patients" class="section">
+                    <div class="erd-note">
+                        <span class="erd-icon">🗂️</span>
+                        <div>
+                            <h4>ישות: מטופל (Patient) – לפי תרשים ERD</h4>
+                            <p>מפתח ראשי: <strong>תעודת זהות</strong> | תכונות: שם המטופל, מספר טלפון, תעודת זהות</p>
+                        </div>
+                    </div>
+                    <div class="two-col">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>הוסף מטופל</h3>
+                                    <p>מילוי פרטי מטופל חדש</p>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="alert-patient" class="alert"></div>
+                                <div class="form-grid cols-1">
+                                    <div class="field"><label>שם המטופל *</label><input id="p-name"
+                                            placeholder="ישראל ישראלי"></div>
+                                    <div class="field"><label>תעודת זהות (מפתח ראשי) *</label><input id="p-tid"
+                                            placeholder="9 ספרות" maxlength="9" inputmode="numeric"></div>
+                                    <div class="field"><label>מספר טלפון</label><input id="p-phone"
+                                            placeholder="050-1234567"></div>
+                                </div>
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" onclick="addPatient()">+ הוסף מטופל</button>
+                                    <button class="btn btn-outline" onclick="clearPatient()">נקה</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>רשימת מטופלים</h3>
+                                    <p>כל המטופלים הרשומים במערכת</p>
+                                </div>
+                            </div>
+                            <div class="search-bar" style="padding:14px 20px 0">
+                                <div class="search-input-wrap">
+                                    <span class="search-icon">🔍</span>
+                                    <input type="text" placeholder="חפש מטופל..." oninput="filterPatients(this.value)">
+                                </div>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>מטופל</th>
+                                            <th>תעודת זהות</th>
+                                            <th>טלפון</th>
+                                            <th>תורים</th>
+                                            <th>פעולה</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-patients">
+                                        <tr>
+                                            <td colspan="5">
+                                                <div class="empty-state">
+                                                    <div class="empty-icon">🧑‍🦽</div>
+                                                    <p>אין מטופלים עדיין</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- APPOINTMENTS -->
+                <section id="sec-appointments" class="section">
+                    <div class="erd-note">
+                        <span class="erd-icon">🗂️</span>
+                        <div>
+                            <h4>ישות: תור (Appointment) + קשרים – לפי תרשים ERD</h4>
+                            <p>מפתח ראשי: <strong>מספר תור</strong> (מזהה ייחודי רץ) | רופא <em>מקבל</em> תור | מטופל
+                                <em>מזמין</em> תור
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom:20px">
+                        <div class="card-header">
+                            <div>
+                                <h3>קבע תור חדש</h3>
+                                <p>חיבור בין רופא, מטופל ותאריך</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="alert-appt" class="alert"></div>
+                            <div class="form-grid">
+                                <div class="field">
+                                    <label>רופא מקבל (Doctor) *</label>
+                                    <select id="a-doctor">
+                                        <option value="">-- בחר רופא --</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>מטופל מזמין (Patient) *</label>
+                                    <select id="a-patient">
+                                        <option value="">-- בחר מטופל --</option>
+                                    </select>
+                                </div>
+                                <div class="field">
+                                    <label>תאריך ושעת התור *</label>
+                                    <input type="datetime-local" id="a-datetime">
+                                </div>
+                                <div class="field">
+                                    <label>סיבת ביקור *</label>
+                                    <input id="a-reason" placeholder="למשל: בדיקה שגרתית, כאב גרון...">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button class="btn btn-accent" onclick="addAppointment()">📅 קבע תור</button>
+                                <button class="btn btn-outline" onclick="clearAppt()">נקה</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>יומן תורים</h3>
+                                <p>כל התורים הקבועים במערכת</p>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <button class="btn btn-outline" style="font-size:12px;padding:6px 12px"
+                                    onclick="filterAppts('all')">הכל</button>
+                                <button class="btn btn-outline" style="font-size:12px;padding:6px 12px"
+                                    onclick="filterAppts('upcoming')">קרובים</button>
+                                <button class="btn btn-outline" style="font-size:12px;padding:6px 12px"
+                                    onclick="filterAppts('past')">עבר</button>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>מס' תור</th>
+                                        <th>רופא</th>
+                                        <th>מטופל</th>
+                                        <th>תאריך ושעה</th>
+                                        <th>סיבת ביקור</th>
+                                        <th>סטטוס</th>
+                                        <th>פעולה</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-appts">
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="empty-state">
+                                                <div class="empty-icon">📅</div>
+                                                <p>אין תורים עדיין</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ERD -->
+                <section id="sec-erd" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>מודל ERD – הסבר תיאורטי</h3>
+                                <p>בסיס תרשים הישויות והקשרים עליו מבוססת המערכת</p>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">
+                                <div
+                                    style="border:2px solid var(--primary);border-radius:var(--radius);padding:16px;text-align:center">
+                                    <div style="font-size:22px;margin-bottom:6px">👨‍⚕️</div>
+                                    <div style="font-weight:700;color:var(--primary);font-size:15px">רופא (Doctor)</div>
+                                    <hr class="divider">
+                                    <div
+                                        style="font-size:13px;text-align:right;display:flex;flex-direction:column;gap:4px">
+                                        <span><u style="font-weight:700">מספר רישיון</u> 🔑 PK</span>
+                                        <span>שם הרופא</span>
+                                        <span style="color:var(--text-muted);text-decoration:line-through">חניה (לא
+                                            רלוונטי)</span>
+                                    </div>
+                                </div>
+                                <div
+                                    style="border:2px solid var(--accent);border-radius:var(--radius);padding:16px;text-align:center">
+                                    <div style="font-size:22px;margin-bottom:6px">📅</div>
+                                    <div style="font-weight:700;color:var(--accent);font-size:15px">תור (Appointment)
+                                    </div>
+                                    <hr class="divider">
+                                    <div
+                                        style="font-size:13px;text-align:right;display:flex;flex-direction:column;gap:4px">
+                                        <span><u style="font-weight:700">מספר תור</u> 🔑 PK (רץ)</span>
+                                        <span>תאריך ושעה</span>
+                                        <span>סיבת ביקור</span>
+                                    </div>
+                                </div>
+                                <div
+                                    style="border:2px solid var(--success);border-radius:var(--radius);padding:16px;text-align:center">
+                                    <div style="font-size:22px;margin-bottom:6px">🧑‍🦽</div>
+                                    <div style="font-weight:700;color:var(--success);font-size:15px">מטופל (Patient)
+                                    </div>
+                                    <hr class="divider">
+                                    <div
+                                        style="font-size:13px;text-align:right;display:flex;flex-direction:column;gap:4px">
+                                        <span><u style="font-weight:700">תעודת זהות</u> 🔑 PK</span>
+                                        <span>שם המטופל</span>
+                                        <span>מספר טלפון</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                                <div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px">
+                                    <div style="font-weight:700;color:var(--primary);margin-bottom:6px">🔗 קשר 1: רופא ◆
+                                        מקבל ◆ תור</div>
+                                    <div style="font-size:13px;color:var(--text-muted)">רופא יכול לקבל תורים רבים. כל
+                                        תור שייך לרופא אחד בלבד.</div>
+                                </div>
+                                <div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px">
+                                    <div style="font-weight:700;color:var(--success);margin-bottom:6px">🔗 קשר 2: מטופל
+                                        ◆ מזמין ◆ תור</div>
+                                    <div style="font-size:13px;color:var(--text-muted)">מטופל יכול להזמין תורים רבים. כל
+                                        תור שייך למטופל אחד בלבד.</div>
+                                </div>
+                            </div>
+                            <div
+                                style="margin-top:14px;background:#fef9e7;border:1px solid #f9e79f;border-radius:var(--radius-sm);padding:12px;font-size:13px;color:#7d6608">
+                                <strong>⚠️ עובדה לא רלוונטית שהוצאה מהמודל:</strong> תכונת "חניה" של ישות הרופא לא נכללה
+                                מכיוון שהיא מתארת את כלל הצוות ולא את הרופא כפרט – אינה רלוונטית לניהול תורים ואינה מזהה
+                                ייחודי.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- PATIENT PORTAL OVERLAY -->
+    <div id="patient-portal" class="portal-overlay">
+        <div class="portal-header">
+            <div class="portal-brand">
+                <div class="portal-brand-icon">🏥</div>
+                <div class="portal-brand-text">
+                    <h2>מרפאה דיגיטלית</h2>
+                    <p>ממשק הזמנת תורים למטופלים</p>
+                </div>
+            </div>
+            <button class="portal-close-btn" onclick="closePortal()">← חזרה לניהול</button>
+        </div>
+
+        <div class="portal-body">
+            <!-- Progress -->
+            <div class="portal-progress">
+                <div class="portal-step-dot active" id="pdot-1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">זיהוי</div>
+                </div>
+                <div class="portal-step-dot" id="pdot-2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">בחירת תור</div>
+                </div>
+                <div class="portal-step-dot" id="pdot-3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">אישור</div>
+                </div>
+            </div>
+
+            <div class="portal-card">
+
+                <!-- STEP 1: IDENTIFY -->
+                <div id="pstep-1" class="portal-step-content active">
+                    <h3>שלום! 👋</h3>
+                    <p class="portal-subtitle">הזינו את תעודת הזהות שלכם כדי להתחיל. אם אינכם רשומים במערכת, נרשום אתכם עכשיו.</p>
+                    <div id="portal-alert-1" class="portal-alert"></div>
+                    <div class="portal-field">
+                        <label>תעודת זהות *</label>
+                        <input id="portal-tid" placeholder="הזינו 9 ספרות" maxlength="9" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')">
+                    </div>
+                    <div id="portal-new-fields" style="display:none">
+                        <div style="background:#fff7ed;border:1.5px solid #fed7aa;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:#9a3412">
+                            <strong>מספר זה אינו קיים במערכת.</strong> מלאו את הפרטים הבאים להרשמה:
+                        </div>
+                        <div class="portal-field">
+                            <label>שם מלא *</label>
+                            <input id="portal-name" placeholder="ישראל ישראלי">
+                        </div>
+                        <div class="portal-field">
+                            <label>מספר טלפון</label>
+                            <input id="portal-phone" placeholder="050-1234567">
+                        </div>
+                    </div>
+                    <button class="portal-btn portal-btn-primary" onclick="portalStep1Next()">המשך ←</button>
+                </div>
+
+                <!-- STEP 2: BOOK -->
+                <div id="pstep-2" class="portal-step-content">
+                    <div id="portal-greeting"></div>
+                    <h3>קביעת תור</h3>
+                    <p class="portal-subtitle">בחרו רופא, תאריך ושעה, וציינו את סיבת הביקור.</p>
+                    <div id="portal-alert-2" class="portal-alert"></div>
+                    <div class="portal-field">
+                        <label>בחר רופא *</label>
+                        <select id="portal-doctor">
+                            <option value="">-- בחר רופא --</option>
+                        </select>
+                    </div>
+                    <div class="portal-field">
+                        <label>תאריך ושעה *</label>
+                        <input type="datetime-local" id="portal-datetime">
+                    </div>
+                    <div class="portal-field">
+                        <label>סיבת ביקור *</label>
+                        <input id="portal-reason" placeholder="למשל: בדיקה שגרתית, כאב ראש...">
+                    </div>
+                    <button class="portal-btn portal-btn-accent" onclick="portalStep2Next()">המשך לאישור ←</button>
+                    <button class="portal-btn portal-btn-outline" onclick="portalGoTo(1)">← חזרה</button>
+                </div>
+
+                <!-- STEP 3: CONFIRM -->
+                <div id="pstep-3" class="portal-step-content">
+                    <div id="pconfirm-success" style="display:none;text-align:center;padding:10px 0 20px">
+                        <div class="portal-success-icon">✅</div>
+                        <h3 style="text-align:center;margin-bottom:8px">התור נקבע בהצלחה!</h3>
+                        <p style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:24px">פרטי התור שלכם מופיעים למטה</p>
+                    </div>
+                    <div id="pconfirm-preview">
+                        <h3>סיכום התור</h3>
+                        <p class="portal-subtitle">אנא בדקו שהפרטים נכונים לפני האישור הסופי.</p>
+                    </div>
+                    <div id="portal-confirm-rows" style="margin-bottom:24px"></div>
+                    <div id="pconfirm-actions">
+                        <button class="portal-btn portal-btn-accent" onclick="portalConfirm()">✅ אשר וקבע תור</button>
+                        <button class="portal-btn portal-btn-outline" onclick="portalGoTo(2)">← ערוך פרטים</button>
+                    </div>
+                    <div id="pconfirm-done" style="display:none">
+                        <button class="portal-btn portal-btn-primary" onclick="portalGoTo(1);resetPortal()">+ קבע תור נוסף</button>
+                        <button class="portal-btn portal-btn-outline" onclick="closePortal()">סיום</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let doctors = [];
+        let patients = [];
+        let appointments = [];
+        let apptCounter = 1;
+        let apptFilter = 'all';
+
+        // NAV
+        const titles = {
+            dashboard: ['לוח בקרה', 'סקירה כללית של המערכת', '📊'],
+            doctors: ['רופאים', 'ניהול רופאי המרפאה', '👨‍⚕️'],
+            patients: ['מטופלים', 'ניהול מטופלי המרפאה', '🧑‍🦽'],
+            appointments: ['תורים', 'ניהול יומן התורים', '📅'],
+            erd: ['מודל ERD', 'תרשים ישויות וקשרים', '🗂️']
+        };
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('sec-' + id).classList.add('active');
+            const items = document.querySelectorAll('.nav-item');
+            const order = ['dashboard', 'doctors', 'patients', 'appointments', 'erd'];
+            items[order.indexOf(id)].classList.add('active');
+            document.getElementById('page-title').textContent = titles[id][0];
+            document.getElementById('page-sub').textContent = titles[id][1];
+            document.getElementById('topbar-icon').textContent = titles[id][2];
+        }
+
+        function initials(name) {
+            return name.trim().split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function formatDT(dt) {
+            if (!dt) return '—';
+            const d = new Date(dt);
+            return d.toLocaleDateString('he-IL') + ' ' + d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function isUpcoming(dt) {
+            return new Date(dt) >= new Date();
+        }
+
+        function showAlert(id, msg, type) {
+            const el = document.getElementById(id);
+            el.textContent = (type === 'success' ? '✅ ' : '❌ ') + msg;
+            el.className = 'alert ' + type;
+            setTimeout(() => { el.className = 'alert'; }, 3000);
+        }
+
+        function updateStats() {
+            const upcoming = appointments.filter(a => isUpcoming(a.datetime)).length;
+            document.getElementById('stat-doctors').textContent = doctors.length;
+            document.getElementById('stat-patients').textContent = patients.length;
+            document.getElementById('stat-upcoming').textContent = upcoming;
+            document.getElementById('stat-total').textContent = appointments.length;
+            document.getElementById('badge-doctors').textContent = doctors.length;
+            document.getElementById('badge-patients').textContent = patients.length;
+            document.getElementById('badge-appts').textContent = appointments.length;
+            renderUpcoming();
+        }
+
+        function renderUpcoming() {
+            const el = document.getElementById('upcoming-list');
+            const list = appointments.filter(a => isUpcoming(a.datetime)).sort((a, b) => new Date(a.datetime) - new Date(b.datetime)).slice(0, 5);
+            if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>אין תורים קרובים</p></div>'; return; }
+            el.innerHTML = list.map(a => `
+    <div class="upcoming-row">
+      <div class="avatar av-orange" style="font-size:11px;font-weight:800">#${a.id}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.patient.name} <span style="color:var(--text-muted);font-weight:400">←</span> ${a.doctor.name}</div>
+        <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px">📅 ${formatDT(a.datetime)}&nbsp;&nbsp;·&nbsp;&nbsp;${a.reason}</div>
+      </div>
+      <span class="badge badge-upcoming">קרוב</span>
+    </div>`).join('');
+        }
+
+        // DOCTORS
+        function addDoctor() {
+            const name = document.getElementById('d-name').value.trim();
+            const license = document.getElementById('d-license').value.trim();
+            if (!name || !license) { showAlert('alert-doctor', 'יש למלא שם ומספר רישיון', 'error'); return; }
+            if (doctors.find(d => d.license === license)) { showAlert('alert-doctor', 'מספר רישיון כבר קיים במערכת', 'error'); return; }
+            doctors.push({ name, license });
+            clearDoctor();
+            renderDoctors();
+            updateDoctorSelect();
+            updateStats();
+            showAlert('alert-doctor', 'הרופא נוסף בהצלחה!', 'success');
+        }
+
+        function removeDoctor(license) {
+            if (!confirm('האם למחוק רופא זה?')) return;
+            doctors = doctors.filter(d => d.license !== license);
+            appointments = appointments.filter(a => a.doctor.license !== license);
+            renderDoctors(); renderAppts(); updateDoctorSelect(); updateStats();
+        }
+
+        function clearDoctor() {
+            document.getElementById('d-name').value = '';
+            document.getElementById('d-license').value = '';
+        }
+
+        function renderDoctors(list) {
+            const data = list || doctors;
+            const tbody = document.getElementById('tbody-doctors');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">👨‍⚕️</div><p>אין רופאים עדיין</p></div></td></tr>'; return; }
+            tbody.innerHTML = data.map(d => {
+                const cnt = appointments.filter(a => a.doctor.license === d.license).length;
+                return `<tr>
+      <td><div class="name-cell"><div class="avatar av-blue">${initials(d.name)}</div><div><div class="td-name">${d.name}</div></div></div></td>
+      <td><span class="badge badge-blue">${d.license}</span></td>
+      <td>${cnt} תורים</td>
+      <td><button class="btn-danger-sm" onclick="removeDoctor('${d.license}')">הסר</button></td>
+    </tr>`;
+            }).join('');
+        }
+
+        function filterDoctors(q) {
+            renderDoctors(doctors.filter(d => d.name.includes(q) || d.license.includes(q)));
+        }
+
+        function updateDoctorSelect() {
+            const sel = document.getElementById('a-doctor');
+            const v = sel.value;
+            sel.innerHTML = '<option value="">-- בחר רופא --</option>' + doctors.map(d => `<option value="${d.license}">${d.name} (${d.license})</option>`).join('');
+            sel.value = v;
+            portalUpdateDoctorSelect();
+        }
+
+        // PATIENTS
+        function addPatient() {
+            const name = document.getElementById('p-name').value.trim();
+            const tid = document.getElementById('p-tid').value.trim();
+            const phone = document.getElementById('p-phone').value.trim();
+            if (!name || !tid) { showAlert('alert-patient', 'יש למלא שם ותעודת זהות', 'error'); return; }
+            if (!/^\d{9}$/.test(tid)) { showAlert('alert-patient', 'תעודת זהות חייבת להכיל 9 ספרות', 'error'); return; }
+            if (patients.find(p => p.tid === tid)) { showAlert('alert-patient', 'תעודת זהות כבר קיימת במערכת', 'error'); return; }
+            patients.push({ name, tid, phone });
+            clearPatient();
+            renderPatients();
+            updatePatientSelect();
+            updateStats();
+            showAlert('alert-patient', 'המטופל נוסף בהצלחה!', 'success');
+        }
+
+        function removePatient(tid) {
+            if (!confirm('האם למחוק מטופל זה?')) return;
+            patients = patients.filter(p => p.tid !== tid);
+            appointments = appointments.filter(a => a.patient.tid !== tid);
+            renderPatients(); renderAppts(); updatePatientSelect(); updateStats();
+        }
+
+        function clearPatient() {
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-tid').value = '';
+            document.getElementById('p-phone').value = '';
+        }
+
+        function renderPatients(list) {
+            const data = list || patients;
+            const tbody = document.getElementById('tbody-patients');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🧑‍🦽</div><p>אין מטופלים עדיין</p></div></td></tr>'; return; }
+            tbody.innerHTML = data.map(p => {
+                const cnt = appointments.filter(a => a.patient.tid === p.tid).length;
+                return `<tr>
+      <td><div class="name-cell"><div class="avatar av-green">${initials(p.name)}</div><div><div class="td-name">${p.name}</div></div></div></td>
+      <td><span class="badge badge-green">${p.tid}</span></td>
+      <td>${p.phone || '—'}</td>
+      <td>${cnt} תורים</td>
+      <td><button class="btn-danger-sm" onclick="removePatient('${p.tid}')">הסר</button></td>
+    </tr>`;
+            }).join('');
+        }
+
+        function filterPatients(q) {
+            renderPatients(patients.filter(p => p.name.includes(q) || p.tid.includes(q)));
+        }
+
+        function updatePatientSelect() {
+            const sel = document.getElementById('a-patient');
+            const v = sel.value;
+            sel.innerHTML = '<option value="">-- בחר מטופל --</option>' + patients.map(p => `<option value="${p.tid}">${p.name} (${p.tid})</option>`).join('');
+            sel.value = v;
+        }
+
+        // APPOINTMENTS
+        function addAppointment() {
+            const dLic = document.getElementById('a-doctor').value;
+            const pTid = document.getElementById('a-patient').value;
+            const dt = document.getElementById('a-datetime').value;
+            const reason = document.getElementById('a-reason').value.trim();
+            if (!dLic) { showAlert('alert-appt', 'יש לבחור רופא', 'error'); return; }
+            if (!pTid) { showAlert('alert-appt', 'יש לבחור מטופל', 'error'); return; }
+            if (!dt) { showAlert('alert-appt', 'יש לבחור תאריך ושעה', 'error'); return; }
+            if (!reason) { showAlert('alert-appt', 'יש להזין סיבת ביקור', 'error'); return; }
+            const doctor = doctors.find(d => d.license === dLic);
+            const patient = patients.find(p => p.tid === pTid);
+            appointments.push({ id: apptCounter++, doctor, patient, datetime: dt, reason });
+            clearAppt();
+            renderAppts();
+            updateStats();
+            showAlert('alert-appt', 'התור נקבע בהצלחה!', 'success');
+        }
+
+        function removeAppt(id) {
+            if (!confirm('האם לבטל תור זה?')) return;
+            appointments = appointments.filter(a => a.id !== id);
+            renderAppts(); updateStats();
+        }
+
+        function clearAppt() {
+            document.getElementById('a-doctor').value = '';
+            document.getElementById('a-patient').value = '';
+            document.getElementById('a-datetime').value = '';
+            document.getElementById('a-reason').value = '';
+        }
+
+        function filterAppts(f) { apptFilter = f; renderAppts(); }
+
+        function renderAppts() {
+            const now = new Date();
+            let data = [...appointments].sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+            if (apptFilter === 'upcoming') data = data.filter(a => isUpcoming(a.datetime));
+            if (apptFilter === 'past') data = data.filter(a => !isUpcoming(a.datetime));
+            const tbody = document.getElementById('tbody-appts');
+            if (!data.length) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📅</div><p>אין תורים להצגה</p></div></td></tr>'; return; }
+            tbody.innerHTML = data.map(a => {
+                const up = isUpcoming(a.datetime);
+                return `<tr>
+      <td><span class="badge badge-orange">#${a.id}</span></td>
+      <td><div class="name-cell"><div class="avatar av-blue" style="width:28px;height:28px;font-size:10px">${initials(a.doctor.name)}</div>${a.doctor.name}</div></td>
+      <td><div class="name-cell"><div class="avatar av-green" style="width:28px;height:28px;font-size:10px">${initials(a.patient.name)}</div>${a.patient.name}</div></td>
+      <td style="white-space:nowrap">${formatDT(a.datetime)}</td>
+      <td>${a.reason}</td>
+      <td><span class="badge ${up ? 'badge-upcoming' : 'badge-past'}">${up ? 'קרוב' : 'עבר'}</span></td>
+      <td><button class="btn-danger-sm" onclick="removeAppt(${a.id})">בטל</button></td>
+    </tr>`;
+            }).join('');
+        }
+
+        // PATIENT PORTAL
+        let portalPatient = null;
+        let portalIsNew = false;
+
+        function openPortal() {
+            document.getElementById('patient-portal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            portalUpdateDoctorSelect();
+            resetPortal();
+        }
+
+        function closePortal() {
+            document.getElementById('patient-portal').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function resetPortal() {
+            document.getElementById('portal-tid').value = '';
+            document.getElementById('portal-new-fields').style.display = 'none';
+            document.getElementById('portal-name').value = '';
+            document.getElementById('portal-phone').value = '';
+            document.getElementById('portal-doctor').value = '';
+            document.getElementById('portal-datetime').value = '';
+            document.getElementById('portal-reason').value = '';
+            document.getElementById('portal-alert-1').className = 'portal-alert';
+            document.getElementById('portal-alert-2').className = 'portal-alert';
+            portalPatient = null;
+            portalIsNew = false;
+        }
+
+        function portalGoTo(step) {
+            [1,2,3].forEach(i => {
+                document.getElementById('pstep-' + i).classList.toggle('active', i === step);
+                const dot = document.getElementById('pdot-' + i);
+                dot.classList.remove('active','done');
+                if (i < step) dot.classList.add('done');
+                else if (i === step) dot.classList.add('active');
+            });
+        }
+
+        function portalShowAlert(id, msg, type) {
+            const el = document.getElementById(id);
+            el.textContent = (type === 'error' ? '❌ ' : '✅ ') + msg;
+            el.className = 'portal-alert ' + type;
+        }
+
+        function portalStep1Next() {
+            const tid = document.getElementById('portal-tid').value.trim();
+            if (!/^\d{9}$/.test(tid)) { portalShowAlert('portal-alert-1', 'תעודת זהות חייבת להכיל 9 ספרות', 'error'); return; }
+            const existing = patients.find(p => p.tid === tid);
+            if (existing) {
+                portalPatient = existing;
+                portalIsNew = false;
+                document.getElementById('portal-new-fields').style.display = 'none';
+                document.getElementById('portal-alert-1').className = 'portal-alert';
+                portalShowGreeting();
+                portalGoTo(2);
+            } else {
+                const newFields = document.getElementById('portal-new-fields');
+                if (newFields.style.display === 'none') {
+                    newFields.style.display = 'block';
+                    document.getElementById('portal-alert-1').className = 'portal-alert';
+                    return;
+                }
+                const name = document.getElementById('portal-name').value.trim();
+                const phone = document.getElementById('portal-phone').value.trim();
+                if (!name) { portalShowAlert('portal-alert-1', 'יש להזין שם מלא', 'error'); return; }
+                portalPatient = { name, tid, phone };
+                portalIsNew = true;
+                portalShowGreeting();
+                portalGoTo(2);
+            }
+        }
+
+        function portalShowGreeting() {
+            const el = document.getElementById('portal-greeting');
+            const av = portalPatient.name.trim().split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase();
+            el.innerHTML = `<div class="patient-greeting">
+                <div class="greet-avatar">${av}</div>
+                <div class="greet-text">
+                    <strong>שלום, ${portalPatient.name}!</strong>
+                    <span>${portalIsNew ? 'ברוכים הבאים — נרשמתם בהצלחה' : 'ברוכים השבים למרפאה'}</span>
+                </div>
+            </div>`;
+        }
+
+        function portalStep2Next() {
+            const dLic = document.getElementById('portal-doctor').value;
+            const dt = document.getElementById('portal-datetime').value;
+            const reason = document.getElementById('portal-reason').value.trim();
+            if (!doctors.length) { portalShowAlert('portal-alert-2', 'אין רופאים זמינים במערכת — צור קשר עם המרפאה', 'error'); return; }
+            if (!dLic) { portalShowAlert('portal-alert-2', 'יש לבחור רופא', 'error'); return; }
+            if (!dt) { portalShowAlert('portal-alert-2', 'יש לבחור תאריך ושעה', 'error'); return; }
+            if (new Date(dt) < new Date()) { portalShowAlert('portal-alert-2', 'לא ניתן לקבוע תור בעבר', 'error'); return; }
+            if (!reason) { portalShowAlert('portal-alert-2', 'יש להזין סיבת ביקור', 'error'); return; }
+            const doctor = doctors.find(d => d.license === dLic);
+            document.getElementById('portal-confirm-rows').innerHTML = `
+                <div class="portal-confirm-row"><div class="portal-confirm-icon">👤</div><div><div class="portal-confirm-label">מטופל</div><div class="portal-confirm-value">${portalPatient.name}</div></div></div>
+                <div class="portal-confirm-row"><div class="portal-confirm-icon">👨‍⚕️</div><div><div class="portal-confirm-label">רופא</div><div class="portal-confirm-value">${doctor.name}</div></div></div>
+                <div class="portal-confirm-row"><div class="portal-confirm-icon">📅</div><div><div class="portal-confirm-label">תאריך ושעה</div><div class="portal-confirm-value">${formatDT(dt)}</div></div></div>
+                <div class="portal-confirm-row"><div class="portal-confirm-icon">💬</div><div><div class="portal-confirm-label">סיבת ביקור</div><div class="portal-confirm-value">${reason}</div></div></div>`;
+            document.getElementById('pconfirm-success').style.display = 'none';
+            document.getElementById('pconfirm-preview').style.display = 'block';
+            document.getElementById('pconfirm-actions').style.display = 'block';
+            document.getElementById('pconfirm-done').style.display = 'none';
+            portalGoTo(3);
+        }
+
+        function portalConfirm() {
+            const dLic = document.getElementById('portal-doctor').value;
+            const dt = document.getElementById('portal-datetime').value;
+            const reason = document.getElementById('portal-reason').value.trim();
+            const doctor = doctors.find(d => d.license === dLic);
+            if (portalIsNew) {
+                patients.push(portalPatient);
+                renderPatients();
+                updatePatientSelect();
+            }
+            appointments.push({ id: apptCounter++, doctor, patient: portalPatient, datetime: dt, reason });
+            renderAppts();
+            updateStats();
+            document.getElementById('pconfirm-success').style.display = 'block';
+            document.getElementById('pconfirm-preview').style.display = 'none';
+            document.getElementById('pconfirm-actions').style.display = 'none';
+            document.getElementById('pconfirm-done').style.display = 'block';
+            [1,2,3].forEach(i => {
+                const dot = document.getElementById('pdot-' + i);
+                dot.classList.remove('active','done');
+                dot.classList.add('done');
+            });
+        }
+
+        function portalUpdateDoctorSelect() {
+            const sel = document.getElementById('portal-doctor');
+            sel.innerHTML = '<option value="">-- בחר רופא --</option>' + doctors.map(d => `<option value="${d.license}">${d.name}</option>`).join('');
+        }
+
+        // DATE
+        function setDate() {
+            const d = new Date();
+            document.getElementById('topbar-date').textContent = d.toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        setDate();
+    </script>
+</body>
+
+</html>
